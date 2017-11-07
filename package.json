@@ -1,0 +1,11 @@
+{
+  "name": "discord-easy-cal",
+  "version": "1.0.0",
+  "description": "ALL OF THE CALENDARS",
+  "main": "bot.js",
+  "author": "lexwebb",
+  "dependencies": {
+    "discord.io": "^2.5.3",
+    "winston": "^2.4.0"
+  }
+}
