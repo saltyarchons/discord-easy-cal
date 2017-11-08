@@ -4,8 +4,17 @@
   "description": "ALL OF THE CALENDARS",
   "main": "bot.js",
   "author": "lexwebb",
+  "scripts": {
+    "dev": "node app.js",
+    "lint": "./node_modules/.bin/eslint src/"
+  },
   "dependencies": {
     "discord.io": "^2.5.3",
     "winston": "^2.4.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.10.0",
+    "eslint-config-airbnb-base": "^12.1.0",
+    "eslint-plugin-import": "^2.8.0"
   }
 }
