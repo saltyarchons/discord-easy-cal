@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "discord.io": "^2.5.3",
+    "discord.js": "^11.2.1",
+    "fs": "0.0.1-security",
     "winston": "^2.4.0"
   },
   "devDependencies": {
