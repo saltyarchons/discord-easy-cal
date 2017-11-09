@@ -47,7 +47,7 @@ client.on('message', message => {
     try {
         let commandFile = require(`./src/events/${command}.js`);
         // Run the command
-        commandFile.run(client, message, args);
+        commandFile.run(client, logger, message, args);
     } catch (err) {
         message.reply("An error occured!");
         logger.error(err);
