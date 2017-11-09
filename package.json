@@ -2,7 +2,7 @@
   "name": "discord-easy-cal",
   "version": "1.0.0",
   "description": "ALL OF THE CALENDARS",
-  "main": "bot.js",
+  "main": "app.js",
   "author": "lexwebb",
   "scripts": {
     "dev": "node app.js",

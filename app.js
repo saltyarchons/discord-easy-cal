@@ -22,7 +22,10 @@ fs.readdir("./src/events/", (err, files) => {
     files.forEach(file => {
         let eventFunction = require(`./src/events/${file}`);
         let eventName = file.split(".")[0];
-        events.push(eventName);
+        events.push({
+            name: eventName,
+            aliases: eventFunction.aliases,
+        });
     });
 });
 
@@ -45,9 +48,10 @@ client.on('message', message => {
 
     // Try to find the file that contains the command specified
 
-    if (events.find(e => e === command)) {
+    var event = events.find(e => e.name === command || (e.aliases && e.aliases.find(a => a === command)));
+    if (event) {
         try {
-            let commandFile = require(`./src/events/${command}.js`);
+            let commandFile = require(`./src/events/${event.name}.js`);
             // Run the command
             commandFile.run(client, logger, message, args);
         } catch (err) {
