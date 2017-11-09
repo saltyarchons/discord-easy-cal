@@ -2,8 +2,8 @@ var Discord = require('discord.js');
 var logger = require('winston');
 var auth = require('./auth.json');
 var config = require('./config.json');
+var db = require('./src/db/db.js');
 const fs = require("fs");
-
 // Configure logger settings
 logger.remove(logger.transports.Console);
 logger.add(logger.transports.Console, {
@@ -36,7 +36,7 @@ client.on('ready', () => {
 });
 
 client.on('message', message => {
-    // Ignore messages forom bots
+    // Ignore messages from bots
     if (message.author.bot) return;
     // Ignore messages which do not start in the prefix specified in the config
     if (message.content.indexOf(config.prefix) !== 0) return;

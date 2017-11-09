@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "ALL OF THE CALENDARS",
   "main": "app.js",
-  "author": "lexwebb",
+  "author": "lexwebb, notarealtree",
   "scripts": {
     "dev": "node app.js",
     "lint": "./node_modules/.bin/eslint src/"
@@ -11,6 +11,7 @@
   "dependencies": {
     "discord.io": "^2.5.3",
     "discord.js": "^11.2.1",
+    "elasticsearch": "^13.3.1",
     "fs": "0.0.1-security",
     "winston": "^2.4.0"
   },

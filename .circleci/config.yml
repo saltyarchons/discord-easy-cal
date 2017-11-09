@@ -35,6 +35,3 @@ jobs:
         
       # run lint!
       - run: yarn lint
-
-
-
