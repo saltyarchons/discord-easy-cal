@@ -6,7 +6,7 @@
   "author": "lexwebb, notarealtree",
   "scripts": {
     "dev": "node app.js",
-    "lint": "./node_modules/.bin/eslint src/"
+    "lint": "./node_modules/.bin/eslint src/ app.js"
   },
   "dependencies": {
     "discord.io": "^2.5.3",

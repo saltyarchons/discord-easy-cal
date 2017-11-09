@@ -1,13 +1,16 @@
-var Discord = require('discord.js');
-var logger = require('winston');
-var auth = require('./auth.json');
-var config = require('./config.json');
-var db = require('./src/db/db.js');
-const fs = require("fs");
+/* eslint no-unused-vars: 0 */
+/* eslint import/no-dynamic-require: 0 */
+/* eslint global-require: 0 */
+const Discord = require('discord.js');
+const logger = require('winston');
+const auth = require('./auth.json');
+const config = require('./config.json');
+const db = require('./src/db/db.js');
+const fs = require('fs');
 // Configure logger settings
 logger.remove(logger.transports.Console);
 logger.add(logger.transports.Console, {
-    colorize: true
+    colorize: true,
 });
 logger.level = 'debug';
 
@@ -16,26 +19,27 @@ const client = new Discord.Client();
 
 const events = [];
 
-// Load our events 
-fs.readdir("./src/events/", (err, files) => {
-    if (err) return console.error(err);
-    files.forEach(file => {
-        let eventFunction = require(`./src/events/${file}`);
-        let eventName = file.split(".")[0];
+// Load our events
+fs.readdir('./src/events/', (err, files) => {
+    if (err) return logger.error(err);
+    files.forEach((file) => {
+        const eventFunction = require(`./src/events/${file}`);
+        const eventName = file.split('.')[0];
         events.push({
             name: eventName,
             aliases: eventFunction.aliases,
         });
     });
+    return true;
 });
 
 client.on('ready', () => {
     logger.info('Connected');
     logger.info('Logged in as: ');
-    logger.info(client.user.username + ' - (' + client.user.id + ')');
+    logger.info(`${client.user.username} - (${client.user.id})`);
 });
 
-client.on('message', message => {
+client.on('message', (message) => {
     // Ignore messages from bots
     if (message.author.bot) return;
     // Ignore messages which do not start in the prefix specified in the config
@@ -47,15 +51,19 @@ client.on('message', message => {
     const command = args.shift().toLowerCase();
 
     // Try to find the file that contains the command specified
-
-    var event = events.find(e => e.name === command || (e.aliases && e.aliases.find(a => a === command)));
+    // https://stackoverflow.com/questions/45856446/discord-js-reply-to-message-then-wait-for-reply
+    const event = events.find((e) => {
+        return e.name === command || (e.aliases && e.aliases.find((a) => {
+            return a === command;
+        }));
+    });
     if (event) {
         try {
-            let commandFile = require(`./src/events/${event.name}.js`);
+            const commandFile = require(`./src/events/${event.name}.js`);
             // Run the command
             commandFile.run(client, logger, message, args);
         } catch (err) {
-            message.reply("An error occured!");
+            message.reply('An error occured!');
             logger.error(err);
         }
     }
