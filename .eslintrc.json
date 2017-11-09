@@ -6,6 +6,7 @@
             "error",
             4
         ],
-        "arrow-body-style": ["error", "always"]
+        "arrow-body-style": ["error", "always"],
+        "no-underscore-dangle": ["off"]
     }
 }

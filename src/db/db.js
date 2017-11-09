@@ -53,3 +53,13 @@ module.exports.putCalendar = (calendar) => {
         }
     });
 };
+
+module.exports.getCalendarById = (id) => {
+    return client.get({
+        index: CALENDAR_INDEX,
+        type: CALENDAR_TYPE,
+        id,
+    }).then((result) => {
+        return result._source;
+    });
+};

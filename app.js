@@ -33,7 +33,7 @@ client.on('ready', () => {
 });
 
 client.on('message', message => {
-    // Ignore messages forom bots
+    // Ignore messages from bots
     if (message.author.bot) return;
     // Ignore messages which do not start in the prefix specified in the config
     if (message.content.indexOf(config.prefix) !== 0) return;
