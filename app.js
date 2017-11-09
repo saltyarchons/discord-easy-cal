@@ -44,13 +44,16 @@ client.on('message', message => {
     const command = args.shift().toLowerCase();
 
     // Try to find the file that contains the command specified
-    try {
-        let commandFile = require(`./src/events/${command}.js`);
-        // Run the command
-        commandFile.run(client, logger, message, args);
-    } catch (err) {
-        message.reply("An error occured!");
-        logger.error(err);
+
+    if (events.find(e => e === command)) {
+        try {
+            let commandFile = require(`./src/events/${command}.js`);
+            // Run the command
+            commandFile.run(client, logger, message, args);
+        } catch (err) {
+            message.reply("An error occured!");
+            logger.error(err);
+        }
     }
 });
 
