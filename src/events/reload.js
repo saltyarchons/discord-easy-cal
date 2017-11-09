@@ -5,3 +5,5 @@ exports.run = (client, logger, message, args) => {
     message.reply(`The command ${args[0]} has been reloaded`);
     return true;
 };
+
+exports.aliases = ['r'];
