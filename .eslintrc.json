@@ -5,6 +5,7 @@
         "indent": [
             "error",
             4
-        ]
+        ],
+        "arrow-body-style": ["error", "always"]
     }
 }

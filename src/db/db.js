@@ -3,12 +3,12 @@ const elasticsearch = require('elasticsearch');
 const CALENDAR_INDEX = 'calendar';
 const CALENDAR_TYPE = CALENDAR_INDEX;
 
-let client = new elasticsearch.Client({
-    host: 'localhost:9200', //TODO(tree): make this configurable
-    log: 'info'
+const client = new elasticsearch.Client({
+    host: 'localhost:9200',
+    log: 'info',
 });
 
-client.indices.exists({index: CALENDAR_INDEX}, (error, exists) => {
+client.indices.exists({ index: CALENDAR_INDEX }, (error, exists) => {
     if (error) {
         console.error(error);
         return;
@@ -16,14 +16,14 @@ client.indices.exists({index: CALENDAR_INDEX}, (error, exists) => {
     if (exists) {
         return;
     }
-    client.indices.create({index: CALENDAR_INDEX}, (error, data) => {
+    client.indices.create({ index: CALENDAR_INDEX }, (err) => {
         // TODO(tree): add actual index mappings
-        if (error) {
-            console.error(error);
+        if (err) {
+            console.error(err);
             return;
         }
         console.log('Successfully created calendar index');
-    })
+    });
 });
 
 module.exports.getAllCalendars = () => {
@@ -31,29 +31,25 @@ module.exports.getAllCalendars = () => {
         index: CALENDAR_INDEX,
         body: {
             query: {
-                match_all: {}
-            }
-        }
-    }).then(result => {
+                match_all: {},
+            },
+        },
+    }).then((result) => {
         return result.hits.hits;
-    })
+    });
 };
 
 module.exports.putCalendar = (calendar) => {
-    if (!('id' in calendar)) {
-        throw 'Calendar ' + calendar + ' doesn\'t contain id column';
-    }
     client.index({
         index: CALENDAR_INDEX,
         type: CALENDAR_TYPE,
         id: calendar.id,
-        body: calendar
-    }, (error, response) => {
+        body: calendar,
+    }, (error) => {
         if (error) {
             console.error(error);
         } else {
             console.log(`Calendar with ${calendar.id} has successfully been inserted`);
         }
-
-    })
+    });
 };
