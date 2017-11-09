@@ -1,54 +1,58 @@
-var Discord = require('discord.io');
+var Discord = require('discord.js');
 var logger = require('winston');
 var auth = require('./auth.json');
+var config = require('./config.json');
 var db = require('./src/db/db.js');
+const fs = require("fs");
 // Configure logger settings
 logger.remove(logger.transports.Console);
 logger.add(logger.transports.Console, {
     colorize: true
 });
 logger.level = 'debug';
+
 // Initialize Discord Bot
-var bot = new Discord.Client({
-   token: auth.token,
-   autorun: true
+const client = new Discord.Client();
+
+const events = [];
+
+// Load our events 
+fs.readdir("./src/events/", (err, files) => {
+    if (err) return console.error(err);
+    files.forEach(file => {
+        let eventFunction = require(`./src/events/${file}`);
+        let eventName = file.split(".")[0];
+        events.push(eventName);
+    });
 });
-bot.on('ready', function (evt) {
+
+client.on('ready', () => {
     logger.info('Connected');
     logger.info('Logged in as: ');
-    logger.info(bot.username + ' - (' + bot.id + ')');
+    logger.info(client.user.username + ' - (' + client.user.id + ')');
 });
 
-bot.on('message', function (user, userID, channelID, message, evt) {
-    // Our bot needs to know if it will execute a command
-    // It will listen for messages that will start with `!`
-    if (message == 'get') {
-        db.getAllCalendars().then(object => {
-            bot.sendMessage({
-                to: channelID,
-                message: JSON.stringify(object)
-            });
-        });
-    }
+client.on('message', message => {
+    // Ignore messages forom bots
+    if (message.author.bot) return;
+    // Ignore messages which do not start in the prefix specified in the config
+    if (message.content.indexOf(config.prefix) !== 0) return;
 
-    if (message == 'put') {
-        db.putCalendar({id: '123132132', message: message});
-    }
+    // Gather args from the input command
+    const args = message.content.slice(config.prefix.length).trim().split(/ +/g);
+    // Split the command from the args and assign
+    const command = args.shift().toLowerCase();
 
-    if (message.substring(0, 1) == '!') {
-        var args = message.substring(1).split(' ');
-        var cmd = args[0];
-
-        args = args.splice(1);
-        switch(cmd) {
-            // !ping
-            case 'ping':
-                bot.sendMessage({
-                    to: channelID,
-                    message: 'Pong!'
-                });
-            break;
-            // Just add any case commands if you want to..
-        }
+    // Try to find the file that contains the command specified
+    try {
+        let commandFile = require(`./src/events/${command}.js`);
+        // Run the command
+        commandFile.run(client, logger, message, args);
+    } catch (err) {
+        message.reply("An error occured!");
+        logger.error(err);
     }
 });
+
+// Log in the bot
+client.login(auth.token);
