@@ -13,6 +13,7 @@
     "discord.js": "^11.2.1",
     "elasticsearch": "^13.3.1",
     "fs": "0.0.1-security",
+    "retry": "^0.10.1",
     "winston": "^2.4.0"
   },
   "devDependencies": {
