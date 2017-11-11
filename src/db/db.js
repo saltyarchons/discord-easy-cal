@@ -1,6 +1,7 @@
 const elasticsearch = require('elasticsearch');
 const logger = require('winston');
 const retry = require('retry');
+const config = require('../../config.json');
 
 const CALENDAR_INDEX = 'calendar';
 const CALENDAR_TYPE = CALENDAR_INDEX;
@@ -29,19 +30,20 @@ function checkAndCreateMissingIndices() {
 
 function startup() {
     const operation = retry.operation({
-        retries: 5,
-        factor: 1,
-        minTimeout: 10 * 1000,
+        retries: config.db.retry.times,
+        factor: config.db.retry.factor,
+        minTimeout: config.db.retry.minTimeoutInSeconds * 1000,
     });
     operation.attempt((currentAttempt) => {
         logger.info(`Attempting to connect to elasticsearch (attempt ${currentAttempt}).`);
         client = new elasticsearch.Client({
-            host: 'http://elasticsearch:9200',
-            log: 'info',
+            host: config.db.host,
+            log: config.db.log,
         });
         client.ping({}, (error) => {
             if (operation.retry(error)) {
-                logger.warn('Failed to connect to elasticsearch, retrying in 10 seconds.');
+                logger.warn(`Failed to connect to elasticsearch, 
+                retrying in ${config.db.retry.minTimeoutInSeconds} seconds.`);
                 return;
             }
             logger.info('Successfully connected to elasticsearch.');
