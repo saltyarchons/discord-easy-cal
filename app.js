@@ -7,6 +7,7 @@ const auth = require('./auth.json'); // eslint-disable-line import/no-unresolved
 const config = require('./config.json');
 const db = require('./src/db/db.js');
 const fs = require('fs');
+const httpServer = require('./src/http/server.js');
 // Configure logger settings
 logger.remove(logger.transports.Console);
 logger.add(logger.transports.Console, {
