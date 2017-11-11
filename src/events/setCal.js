@@ -1,9 +1,9 @@
 const google = require('googleapis');
-const auth = require('../../auth.json');
+const auth = require('../../auth.json');// eslint-disable-line import/no-unresolved
 
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 
-exports.run = (client, logger, message, args) =>{
+exports.run = (client, logger, message) => {
     const clientSecret = auth.gcal.client_secret;
     const clientId = auth.gcal.client_id;
     const redirectUrl = auth.gcal.redirect_uris[0];
