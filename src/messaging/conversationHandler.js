@@ -60,6 +60,7 @@ exports.ConversationHandler = class {
         // Retrieve the first question in the qestion array.
         const questions = this.messageChain.splice(0, 1);
         if (questions.length === 0) {
+            callback(this.replies);
             return;
         }
 
