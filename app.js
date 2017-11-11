@@ -3,7 +3,7 @@
 /* eslint global-require: 0 */
 const Discord = require('discord.js');
 const logger = require('winston');
-const auth = require('./auth.json');
+const auth = require('./auth.json'); // eslint-disable-line import/no-unresolved
 const config = require('./config.json');
 const db = require('./src/db/db.js');
 const fs = require('fs');
