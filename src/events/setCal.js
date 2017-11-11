@@ -14,6 +14,7 @@ exports.run = (client, logger, message, args) =>{
     const authUrl = oauth2Client.generateAuthUrl({
         access_type: 'offline',
         scope: SCOPES,
+        state: message.guild.id,
     });
     message.channel.send(`Authorize this app by visiting this url: ${authUrl}`);
 };
