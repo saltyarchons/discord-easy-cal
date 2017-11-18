@@ -8,5 +8,8 @@
             "factor": 1,
             "minTimeoutInSeconds": 10
         }
+    },
+    "http": {
+      "port": 8080
     }
 }
