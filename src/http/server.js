@@ -2,13 +2,13 @@ const http = require('http');
 const url = require('url');
 const logger = require('winston');
 
-let lport = 8080;
+let listeningPort = 8080;
 
 module.exports.setPort = (port) => {
     if (typeof port === 'number' && port <= 65535) {
-        lport = port;
+        listeningPort = port;
     } else {
-        throw new RangeError('Invlaid Listening Port');
+        throw new RangeError(`Invalid Listening Port, port ${port}`);
     }
 };
 
@@ -23,5 +23,5 @@ module.exports.start = () => {
             logger.info(guild);
         }
         res.write('Hello World!');
-    }).listen(lport);
+    }).listen(listeningPort);
 };
