@@ -11,13 +11,20 @@ exports.DB = class {
         this.client = null;
     }
 
+    /**
+     * Initiates connection with ElasticSearch. Retries based on what's provided in the config
+     * and fails if no connection can be established.
+     */
     connect() {
         const operation = retry.operation({
             retries: this.config.db.retry.times,
             factor: this.config.db.retry.factor,
             minTimeout: this.config.db.retry.minTimeoutInSeconds * 1000,
         });
-        var result = new Promise((resolve, reject) => {
+
+        // Where does the proper reject come from for this?
+        // We should reject properly and then fatally fail.
+        const result = new Promise((resolve) => {
             operation.attempt((currentAttempt) => {
                 logger.info(`Attempting to connect to elasticsearch (attempt ${currentAttempt}).`);
                 this.client = new elasticsearch.Client({
@@ -38,7 +45,10 @@ exports.DB = class {
         });
         return result;
     }
-    
+
+    /**
+     * Creates indices for calendar if none exist. Called by success in the connect function.
+     */
     checkAndCreateMissingIndices() {
         this.client.indices.exists({ index: CALENDAR_INDEX }, (error, exists) => {
             if (error) {
@@ -59,6 +69,9 @@ exports.DB = class {
         });
     }
 
+    /**
+     * Returns all stored calendars.
+     */
     getAllCalendars() {
         return this.client.search({
             index: CALENDAR_INDEX,
@@ -72,8 +85,12 @@ exports.DB = class {
         });
     }
 
+    /**
+     * Stores the provided calendar in ElasticSearch. Calendars are expected to contain an id.
+     * @param {Object} calendar The calendar to store.
+     */
     putCalendar(calendar) {
-       this.client.index({
+        this.client.index({
             index: CALENDAR_INDEX,
             type: CALENDAR_TYPE,
             id: calendar.id,
@@ -87,7 +104,11 @@ exports.DB = class {
         });
     }
 
-    getCalendarById() {
+    /**
+     * Loads a calendar by id.
+     * @param {String} id The id.
+     */
+    getCalendarById(id) {
         return this.client.get({
             index: CALENDAR_INDEX,
             type: CALENDAR_TYPE,
@@ -96,4 +117,4 @@ exports.DB = class {
             return result._source;
         });
     }
-}
+};

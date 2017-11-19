@@ -21,7 +21,7 @@ const client = new Discord.Client();
 // Start DB
 const database = new db.DB(config);
 database.connect().then(() => {
-    console.log('DB Ready');
+    logger.info('DB Ready');
 });
 
 const events = [];
