@@ -22,6 +22,9 @@ const client = new Discord.Client();
 const database = new db.DB(config);
 database.connect().then(() => {
     logger.info('DB Ready');
+}).catch(() => {
+    logger.error('Failed to connect to ElasticSearch, terminating process.');
+    process.exit(1);
 });
 
 const events = [];

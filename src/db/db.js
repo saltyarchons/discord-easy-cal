@@ -22,9 +22,7 @@ exports.DB = class {
             minTimeout: this.config.db.retry.minTimeoutInSeconds * 1000,
         });
 
-        // Where does the proper reject come from for this?
-        // We should reject properly and then fatally fail.
-        const result = new Promise((resolve) => {
+        const result = new Promise((resolve, reject) => {
             operation.attempt((currentAttempt) => {
                 logger.info(`Attempting to connect to elasticsearch (attempt ${currentAttempt}).`);
                 this.client = new elasticsearch.Client({
@@ -33,13 +31,15 @@ exports.DB = class {
                 });
                 this.client.ping({}, (error) => {
                     if (operation.retry(error)) {
-                        logger.warn(`Failed to connect to elasticsearch, 
-                        retrying in ${this.config.db.retry.minTimeoutInSeconds} seconds.`);
+                        logger.warn(`Failed to connect to elasticsearch, retrying in ${this.config.db.retry.minTimeoutInSeconds} seconds.`);
                         return;
                     }
-                    logger.info('Successfully connected to elasticsearch.');
-                    this.checkAndCreateMissingIndices();
-                    resolve();
+                    if (operation.attempts() > this.config.db.retry.times) {
+                        reject();
+                    } else {
+                        this.checkAndCreateMissingIndices();
+                        resolve();
+                    }
                 });
             });
         });
