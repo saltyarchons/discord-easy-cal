@@ -34,6 +34,10 @@ fs.readdir('./src/events/', (err, files) => {
     return true;
 });
 
+// load the httpServer
+httpServer.setPort(config.http.port);
+httpServer.start();
+
 client.on('ready', () => {
     logger.info('Connected');
     logger.info('Logged in as: ');
