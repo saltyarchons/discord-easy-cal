@@ -37,6 +37,6 @@ jobs:
       # run lint!
       - run: yarn lint
 
-      - run: yarn install -g mocha
+      - run: yarn global add mocha
 
       - run: yarn test
