@@ -18,6 +18,12 @@ logger.level = 'debug';
 // Initialize Discord Bot
 const client = new Discord.Client();
 
+// Start DB
+const database = new db.DB(config);
+database.connect().then(() => {
+    console.log('DB Ready');
+});
+
 const events = [];
 
 // Load our events
