@@ -35,10 +35,10 @@ exports.DB = class {
                         return;
                     }
                     if (operation.attempts() > this.config.db.retry.times) {
-                        reject();
+                        reject(error);
                     } else {
                         this.checkAndCreateMissingIndices();
-                        resolve();
+                        resolve('Connected Successfully');
                     }
                 });
             });

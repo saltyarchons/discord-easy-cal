@@ -1,0 +1,15 @@
+{
+    "prefix": "!cal",
+    "db": {
+        "host": "http://localhost:9200",
+        "log": "info",
+        "retry": {
+            "times": 5,
+            "factor": 1,
+            "minTimeoutInSeconds": 10
+        }
+    },
+    "http": {
+      "port": 8080
+    }
+}

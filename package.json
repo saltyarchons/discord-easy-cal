@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "node app.js",
     "lint": "./node_modules/.bin/eslint src/ app.js",
-    "lint-fix": "./node_modules/.bin/eslint src/ --fix"
+    "lint-fix": "./node_modules/.bin/eslint src/ --fix",
+    "test": "node_modules/.bin/mocha --reporter mocha-circleci-reporter tests/**/*.js"
   },
   "dependencies": {
     "discord.io": "^2.5.3",
@@ -21,8 +22,11 @@
     "winston": "^2.4.0"
   },
   "devDependencies": {
+    "chai": "^4.1.2",
     "eslint": "^4.10.0",
     "eslint-config-airbnb-base": "^12.1.0",
-    "eslint-plugin-import": "^2.8.0"
+    "eslint-plugin-import": "^2.8.0",
+    "mocha": "^4.0.1",
+    "mocha-circleci-reporter": "0.0.2"
   }
 }
