@@ -1,7 +1,9 @@
 const http = require('http');
 const url = require('url');
 const db = require('../db/db.js');
+const config = require('../../config.json');
 
+const database = new db.DB(config);
 let listeningPort = 8080;
 
 module.exports.setPort = (port) => {
@@ -19,7 +21,8 @@ module.exports.start = () => {
         if (urlparameters.pathname === '/easyCalAuth') {
             const token = urlparameters.query.code;
             const guild = urlparameters.query.state;
-            db.putCalendar({
+            database.connect();
+            database.putCalendar({
                 id: guild,
                 token,
             });
