@@ -1,6 +1,6 @@
 const http = require('http');
 const url = require('url');
-const logger = require('winston');
+const db = require('../db/db.js');
 
 let listeningPort = 8080;
 
@@ -19,8 +19,10 @@ module.exports.start = () => {
         if (urlparameters.pathname === '/easyCalAuth') {
             const token = urlparameters.query.code;
             const guild = urlparameters.query.state;
-            logger.info(token);
-            logger.info(guild);
+            db.putCalendar({
+                id: guild,
+                token,
+            });
         }
         res.write('Hello World!');
     }).listen(listeningPort);
