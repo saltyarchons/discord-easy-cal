@@ -1,93 +1,120 @@
 const elasticsearch = require('elasticsearch');
 const logger = require('winston');
 const retry = require('retry');
-const config = require('../../config.json');
 
 const CALENDAR_INDEX = 'calendar';
 const CALENDAR_TYPE = CALENDAR_INDEX;
 
-let client;
+exports.DB = class {
+    constructor(config) {
+        this.config = config;
+        this.client = null;
+    }
 
-function checkAndCreateMissingIndices() {
-    client.indices.exists({ index: CALENDAR_INDEX }, (error, exists) => {
-        if (error) {
-            logger.error(error);
-            return;
-        }
-        if (exists) {
-            return;
-        }
-        client.indices.create({ index: CALENDAR_INDEX }, (err) => {
-            // TODO(tree): add actual index mappings
-            if (err) {
-                logger.error(err);
+    /**
+     * Initiates connection with ElasticSearch. Retries based on what's provided in the config
+     * and fails if no connection can be established.
+     */
+    connect() {
+        const operation = retry.operation({
+            retries: this.config.db.retry.times,
+            factor: this.config.db.retry.factor,
+            minTimeout: this.config.db.retry.minTimeoutInSeconds * 1000,
+        });
+
+        const result = new Promise((resolve, reject) => {
+            operation.attempt((currentAttempt) => {
+                logger.info(`Attempting to connect to elasticsearch (attempt ${currentAttempt}).`);
+                this.client = new elasticsearch.Client({
+                    host: this.config.db.host,
+                    log: this.config.db.log,
+                });
+                this.client.ping({}, (error) => {
+                    if (operation.retry(error)) {
+                        logger.warn(`Failed to connect to elasticsearch, retrying in ${this.config.db.retry.minTimeoutInSeconds} seconds.`);
+                        return;
+                    }
+                    if (operation.attempts() > this.config.db.retry.times) {
+                        reject();
+                    } else {
+                        this.checkAndCreateMissingIndices();
+                        resolve();
+                    }
+                });
+            });
+        });
+        return result;
+    }
+
+    /**
+     * Creates indices for calendar if none exist. Called by success in the connect function.
+     */
+    checkAndCreateMissingIndices() {
+        this.client.indices.exists({ index: CALENDAR_INDEX }, (error, exists) => {
+            if (error) {
+                logger.error(error);
                 return;
             }
-            logger.info('Successfully created calendar index');
-        });
-    });
-}
-
-function startup() {
-    const operation = retry.operation({
-        retries: config.db.retry.times,
-        factor: config.db.retry.factor,
-        minTimeout: config.db.retry.minTimeoutInSeconds * 1000,
-    });
-    operation.attempt((currentAttempt) => {
-        logger.info(`Attempting to connect to elasticsearch (attempt ${currentAttempt}).`);
-        client = new elasticsearch.Client({
-            host: config.db.host,
-            log: config.db.log,
-        });
-        client.ping({}, (error) => {
-            if (operation.retry(error)) {
-                logger.warn(`Failed to connect to elasticsearch, 
-                retrying in ${config.db.retry.minTimeoutInSeconds} seconds.`);
+            if (exists) {
                 return;
             }
-            logger.info('Successfully connected to elasticsearch.');
-            checkAndCreateMissingIndices();
+            this.client.indices.create({ index: CALENDAR_INDEX }, (err) => {
+                // TODO(tree): add actual index mappings
+                if (err) {
+                    logger.error(err);
+                    return;
+                }
+                logger.info('Successfully created calendar index');
+            });
         });
-    });
-}
+    }
 
-startup();
-
-module.exports.getAllCalendars = () => {
-    return client.search({
-        index: CALENDAR_INDEX,
-        body: {
-            query: {
-                match_all: {},
+    /**
+     * Returns all stored calendars.
+     */
+    getAllCalendars() {
+        return this.client.search({
+            index: CALENDAR_INDEX,
+            body: {
+                query: {
+                    match_all: {},
+                },
             },
-        },
-    }).then((result) => {
-        return result.hits.hits;
-    });
-};
+        }).then((result) => {
+            return result.hits.hits;
+        });
+    }
 
-module.exports.putCalendar = (calendar) => {
-    client.index({
-        index: CALENDAR_INDEX,
-        type: CALENDAR_TYPE,
-        id: calendar.id,
-        body: calendar,
-    }, (error) => {
-        if (error) {
-            logger.error(error);
-        } else {
-            logger.info(`Calendar with ${calendar.id} has successfully been inserted`);
-        }
-    });
-};
+    /**
+     * Stores the provided calendar in ElasticSearch. Calendars are expected to contain an id.
+     * @param {Object} calendar The calendar to store.
+     */
+    putCalendar(calendar) {
+        this.client.index({
+            index: CALENDAR_INDEX,
+            type: CALENDAR_TYPE,
+            id: calendar.id,
+            body: calendar,
+        }, (error) => {
+            if (error) {
+                logger.error(error);
+            } else {
+                logger.info(`Calendar with ${calendar.id} has successfully been inserted`);
+            }
+        });
+    }
 
-module.exports.getCalendarById = (id) => {
-    return client.get({
-        index: CALENDAR_INDEX,
-        type: CALENDAR_TYPE,
-        id,
-    }).then((result) => {
-        return result._source;
-    });
+    /**
+     * Loads a calendar by id.
+     * @param {String} id The id.
+     */
+    getCalendarById(id) {
+        return this.client.get({
+            index: CALENDAR_INDEX,
+            type: CALENDAR_TYPE,
+            id,
+        }).then((result) => {
+            return result._source;
+        });
+    }
 };
