@@ -8,6 +8,9 @@ jobs:
     docker:
       # specify the version you desire here
       - image: circleci/node:7.10
+      - image: docker.elastic.co/elasticsearch/elasticsearch:5.6.4
+        environment:
+          xpack.security.enabled: false
       
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -26,7 +29,7 @@ jobs:
           # fallback to using the latest cache if no exact match is found
           - v1-dependencies-
 
-      - run: yarn install
+      - run: yarn install --dev
 
       - save_cache:
           paths:
@@ -35,3 +38,21 @@ jobs:
         
       # run lint!
       - run: yarn lint
+
+      # Setup and Run Tests
+      - run:
+          name: Make wait-for-it executable
+          command: chmod +x ~/repo/scripts/wait-for-it.sh
+      - run:
+          name: Check ES is up
+          command: ~/repo/scripts/wait-for-it.sh -t 90 localhost:9200 -- echo "ES is ready."
+      - run: mkdir ~/junit
+      - run: 
+          command: node node_modules/.bin/mocha tests --recursive --reporter mocha-junit-reporter
+          environment:
+            MOCHA_FILE: junit/test-results.xml
+          when: always
+      - store_test_results:
+          path: ~/junit
+      - store_artifacts:
+          path: ~/junit

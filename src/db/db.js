@@ -35,10 +35,10 @@ exports.DB = class {
                         return;
                     }
                     if (operation.attempts() > this.config.db.retry.times) {
-                        reject();
+                        reject(error);
                     } else {
                         this.checkAndCreateMissingIndices();
-                        resolve();
+                        resolve('Connected Successfully');
                     }
                 });
             });
@@ -81,7 +81,7 @@ exports.DB = class {
                 },
             },
         }).then((result) => {
-            return result.hits.hits;
+            return result.hits.hits.map((hit) => { return hit._source; });
         });
     }
 
