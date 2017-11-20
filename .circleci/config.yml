@@ -40,15 +40,10 @@ jobs:
       - run: yarn lint
 
       # Setup and Run Tests
-      - run: mkdir ~/junit
-      - run:
-          name: install dockerize
-          command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && tar -C /usr/local/bin -xzvf --overwrite dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
-          environment:
-            DOCKERIZE_VERSION: v0.5.0
       - run:
           name: Wait for elasticsearch
-          command: dockerize -wait http://localhost:9200 -timeout 2m
+          command: ./scrips/wait-for-it.sh -t 90 http://localhost:9200 -- echo "ES is ready."
+      - run: mkdir ~/junit
       - run: 
           command: node node_modules/.bin/mocha tests --recursive --reporter mocha-junit-reporter
           environment:
