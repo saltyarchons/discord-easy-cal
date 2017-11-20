@@ -81,7 +81,7 @@ exports.DB = class {
                 },
             },
         }).then((result) => {
-            return result.hits.hits;
+            return result.hits.hits.map((hit) => { return hit._source; });
         });
     }
 
