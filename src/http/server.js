@@ -16,20 +16,12 @@ exports.HttpServer = class extends ServiceBase {
             if (urlparameters.pathname === '/easyCalAuth') {
                 const token = urlparameters.query.code;
                 const guild = urlparameters.query.state;
-                bot.app.database.putCalendar({
+                bot.services.database.putCalendar({
                     id: guild,
                     token,
                 });
             }
             res.write('Hello World!');
         }).listen(bot.listeningPort);
-    }
-
-    setPort(port) {
-        if (typeof port === 'number' && port <= 65535) {
-            this.listeningPort = port;
-        } else {
-            throw new RangeError(`Invalid Listening Port, port ${port}`);
-        }
     }
 };
