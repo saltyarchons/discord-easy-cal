@@ -18,8 +18,11 @@ exports.HttpServer = class extends ServiceBase {
             if (urlparameters.pathname === '/easyCalAuth') {
                 const token = urlparameters.query.code;
                 const guild = urlparameters.query.state;
-                bot.logger.info(token);
-                bot.logger.info(guild);
+                bot.database.connect();
+                bot.database.putCalendar({
+                    id: guild,
+                    token,
+                });
             }
             res.write('Hello World!');
         }).listen(bot.listeningPort);
