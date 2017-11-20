@@ -5,8 +5,7 @@ const ServiceBase = require('../serviceBase');
 exports.HttpServer = class extends ServiceBase {
     constructor(app) {
         super(app);
-        this.listeningPort = 8080;
-        this.setPort(this.config.http.port);
+        this.listeningPort = 8080 || this.config.http.port;
     }
 
     start() {
@@ -18,8 +17,7 @@ exports.HttpServer = class extends ServiceBase {
             if (urlparameters.pathname === '/easyCalAuth') {
                 const token = urlparameters.query.code;
                 const guild = urlparameters.query.state;
-                bot.database.connect();
-                bot.database.putCalendar({
+                bot.app.database.putCalendar({
                     id: guild,
                     token,
                 });
