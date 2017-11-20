@@ -42,7 +42,7 @@ jobs:
       # Setup and Run Tests
       - run:
           name: Wait for elasticsearch
-          command: chmod +x ~/repo/scripts/wait-for-it.sh && sh ~/repo/scrips/wait-for-it.sh -t 90 localhost:9200 -- echo "ES is ready."
+          command: chmod +x ~/repo/scripts/wait-for-it.sh && /repo/scrips/wait-for-it.sh -t 90 localhost:9200 -- echo "ES is ready."
       - run: mkdir ~/junit
       - run: 
           command: node node_modules/.bin/mocha tests --recursive --reporter mocha-junit-reporter
