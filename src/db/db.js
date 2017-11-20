@@ -4,6 +4,8 @@ const ServiceBase = require('../serviceBase');
 
 const CALENDAR_INDEX = 'calendar';
 const CALENDAR_TYPE = CALENDAR_INDEX;
+const TOKEN_INDEX = 'token';
+const TOKEN_TYPE = TOKEN_INDEX;
 
 exports.DB = class extends ServiceBase {
     init() {
@@ -63,14 +65,19 @@ exports.DB = class extends ServiceBase {
             if (exists) {
                 return;
             }
-            this.client.indices.create({ index: CALENDAR_INDEX }, (err) => {
-                // TODO(tree): add actual index mappings
-                if (err) {
-                    this.logger.error(err);
-                    return;
-                }
-                this.logger.info('Successfully created calendar index');
-            });
+            this.createIndex(CALENDAR_INDEX, 'Successfully created calendar index.');
+            this.createIndex(TOKEN_INDEX, 'Successfully created token index.');
+        });
+    }
+
+    createIndex(name, message) {
+        this.client.indices.create({ index: name }, (err) => {
+            // TODO(tree): add actual index mappings
+            if (err) {
+                this.logger.error(err);
+                return;
+            }
+            this.logger.info(message);
         });
     }
 
@@ -117,6 +124,40 @@ exports.DB = class extends ServiceBase {
         return this.client.get({
             index: CALENDAR_INDEX,
             type: CALENDAR_TYPE,
+            id,
+        }).then((result) => {
+            return result._source;
+        });
+    }
+
+    /**
+     * Stores a token object under the given id.
+     * @param {String} id Id to stored the object under.
+     * @param {Object} token Token object.
+     */
+    putToken(id, token) {
+        this.client.index({
+            index: TOKEN_INDEX,
+            type: TOKEN_TYPE,
+            id,
+            body: token,
+        }, (error) => {
+            if (error) {
+                this.logger.error(error);
+            } else {
+                this.logger.info(`Token with id ${id} has successfully been inserted`);
+            }
+        });
+    }
+
+    /**
+     * Loads a token by id
+     * @param {String} id id for which to load the token
+     */
+    getToken(id) {
+        this.client.get({
+            index: TOKEN_INDEX,
+            type: TOKEN_TYPE,
             id,
         }).then((result) => {
             return result._source;
