@@ -1,13 +1,13 @@
 const elasticsearch = require('elasticsearch');
-const logger = require('winston');
 const retry = require('retry');
+const ServiceBase = require('../serviceBase');
 
 const CALENDAR_INDEX = 'calendar';
 const CALENDAR_TYPE = CALENDAR_INDEX;
 
-exports.DB = class {
-    constructor(config) {
-        this.config = config;
+exports.DB = class extends ServiceBase {
+    constructor(app) {
+        super(app);
         this.client = null;
     }
 
@@ -24,14 +24,14 @@ exports.DB = class {
 
         const result = new Promise((resolve, reject) => {
             operation.attempt((currentAttempt) => {
-                logger.info(`Attempting to connect to elasticsearch (attempt ${currentAttempt}).`);
+                this.logger.info(`Attempting to connect to elasticsearch (attempt ${currentAttempt}).`);
                 this.client = new elasticsearch.Client({
                     host: this.config.db.host,
                     log: this.config.db.log,
                 });
                 this.client.ping({}, (error) => {
                     if (operation.retry(error)) {
-                        logger.warn(`Failed to connect to elasticsearch, retrying in ${this.config.db.retry.minTimeoutInSeconds} seconds.`);
+                        this.logger.warn(`Failed to connect to elasticsearch, retrying in ${this.config.db.retry.minTimeoutInSeconds} seconds.`);
                         return;
                     }
                     if (operation.attempts() > this.config.db.retry.times) {
@@ -52,7 +52,7 @@ exports.DB = class {
     checkAndCreateMissingIndices() {
         this.client.indices.exists({ index: CALENDAR_INDEX }, (error, exists) => {
             if (error) {
-                logger.error(error);
+                this.logger.error(error);
                 return;
             }
             if (exists) {
@@ -61,10 +61,10 @@ exports.DB = class {
             this.client.indices.create({ index: CALENDAR_INDEX }, (err) => {
                 // TODO(tree): add actual index mappings
                 if (err) {
-                    logger.error(err);
+                    this.logger.error(err);
                     return;
                 }
-                logger.info('Successfully created calendar index');
+                this.logger.info('Successfully created calendar index');
             });
         });
     }
@@ -97,9 +97,9 @@ exports.DB = class {
             body: calendar,
         }, (error) => {
             if (error) {
-                logger.error(error);
+                this.logger.error(error);
             } else {
-                logger.info(`Calendar with ${calendar.id} has successfully been inserted`);
+                this.logger.info(`Calendar with ${calendar.id} has successfully been inserted`);
             }
         });
     }
