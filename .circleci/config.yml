@@ -8,7 +8,6 @@ jobs:
     docker:
       # specify the version you desire here
       - image: circleci/node:7.10
-      - image: docker.elastic.co/elasticsearch/elasticsearch:5.6.4
       
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
@@ -37,17 +36,17 @@ jobs:
       # run lint!
       - run: yarn lint
 
-    test:
-      docker:
-        - image: docker.elastic.co/elasticsearch/elasticsearch:5.6.4
-      steps:
-        - run: mkdir ~/junit
-        - run: 
-            command: node node_modules/.bin/mocha tests --recursive --reporter mocha-junit-reporter
-            environment:
-              MOCHA_FILE: junit/test-results.xml
-            when: always
-        - store_test_results:
-            path: ~/junit
-        - store_artifacts:
-            path: ~/junit
+  test:
+    docker:
+      - image: docker.elastic.co/elasticsearch/elasticsearch:5.6.4
+    steps:
+      - run: mkdir ~/junit
+      - run: 
+          command: node node_modules/.bin/mocha tests --recursive --reporter mocha-junit-reporter
+          environment:
+            MOCHA_FILE: junit/test-results.xml
+          when: always
+      - store_test_results:
+          path: ~/junit
+      - store_artifacts:
+          path: ~/junit
