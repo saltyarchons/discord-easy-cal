@@ -3,8 +3,7 @@ const url = require('url');
 const ServiceBase = require('../serviceBase');
 
 exports.HttpServer = class extends ServiceBase {
-    constructor(app) {
-        super(app);
+    init() {
         this.listeningPort = 8080 || this.config.http.port;
     }
 

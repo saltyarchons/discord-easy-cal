@@ -5,6 +5,14 @@ class ServiceBase {
         this.config = app.config;
         this.auth = app.auth;
     }
+
+    init() {
+        this.logger.info(`Initialising ${this.constructor.name}`);
+    }
+
+    start() {
+        this.logger.info(`Starting ${this.constructor.name}`);
+    }
 }
 
 module.exports = ServiceBase;

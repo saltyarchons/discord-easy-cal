@@ -6,9 +6,14 @@ const CALENDAR_INDEX = 'calendar';
 const CALENDAR_TYPE = CALENDAR_INDEX;
 
 exports.DB = class extends ServiceBase {
-    constructor(app) {
-        super(app);
-        this.client = null;
+    init() {
+        super.init();
+        this.client = undefined;
+    }
+
+    start() {
+        super.start();
+        return this.connect();
     }
 
     /**

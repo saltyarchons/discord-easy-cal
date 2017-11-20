@@ -11,6 +11,7 @@ const bot = {
     logger,
     auth,
     config,
+    services: {},
 };
 
 // Configure logger settings
@@ -20,19 +21,11 @@ logger.add(logger.transports.Console, {
 });
 logger.level = 'debug';
 
-// Start DB
-bot.database = new db.DB(bot);
-bot.database.connect().then(() => {
-    logger.info('DB Ready');
-}).catch(() => {
-    logger.error('Failed to connect to ElasticSearch, terminating process.');
-    process.exit(1);
+bot.services.database = new db.DB(bot);
+bot.services.httpServer = new httpServer.HttpServer(bot);
+bot.services.discordClient = new botClient.BotClient(bot);
+
+Object.keys(bot.services).forEach((serviceKey) => {
+    bot.services[serviceKey].init();
+    bot.services[serviceKey].start();
 });
-
-// load the httpServer
-bot.httpServer = new httpServer.HttpServer(bot);
-bot.httpServer.start();
-
-bot.client = new botClient.BotClient(bot);
-bot.client.init();
-bot.client.start();
