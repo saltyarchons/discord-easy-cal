@@ -4,10 +4,12 @@ const ServiceBase = require('../serviceBase');
 
 exports.HttpServer = class extends ServiceBase {
     init() {
+        super.init();
         this.listeningPort = 8080 || this.config.http.port;
     }
 
     start() {
+        super.start();
         const bot = this;
 
         http.createServer((req, res) => {

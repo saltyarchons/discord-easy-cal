@@ -12,6 +12,7 @@ exports.BotClient = class extends ServiceBase {
     }
 
     init() {
+        super.init();
         const bot = this;
 
         // Load our events
@@ -66,6 +67,7 @@ exports.BotClient = class extends ServiceBase {
     }
 
     start() {
+        super.start();
         // Log in the bot
         this.client.login(this.auth.token);
     }
