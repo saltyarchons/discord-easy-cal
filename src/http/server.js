@@ -1,32 +1,29 @@
 const http = require('http');
 const url = require('url');
-const db = require('../db/db.js');
-const config = require('../../config.json');
+const ServiceBase = require('../serviceBase');
 
-const database = new db.DB(config);
-let listeningPort = 8080;
-
-module.exports.setPort = (port) => {
-    if (typeof port === 'number' && port <= 65535) {
-        listeningPort = port;
-    } else {
-        throw new RangeError(`Invalid Listening Port, port ${port}`);
+exports.HttpServer = class extends ServiceBase {
+    init() {
+        super.init();
+        this.listeningPort = 8080 || this.config.http.port;
     }
-};
 
-module.exports.start = () => {
-    http.createServer((req, res) => {
-        const urlparameters = url.parse(req.url, true);
-        // TODO: make path read from config
-        if (urlparameters.pathname === '/easyCalAuth') {
-            const token = urlparameters.query.code;
-            const guild = urlparameters.query.state;
-            database.connect();
-            database.putCalendar({
-                id: guild,
-                token,
-            });
-        }
-        res.write('Hello World!');
-    }).listen(listeningPort);
+    start() {
+        super.start();
+        const bot = this;
+
+        http.createServer((req, res) => {
+            const urlparameters = url.parse(req.url, true);
+            // TODO: make path read from config
+            if (urlparameters.pathname === '/easyCalAuth') {
+                const token = urlparameters.query.code;
+                const guild = urlparameters.query.state;
+                bot.services.database.putCalendar({
+                    id: guild,
+                    token,
+                });
+            }
+            res.write('Hello World!');
+        }).listen(bot.listeningPort);
+    }
 };

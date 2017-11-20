@@ -2,11 +2,26 @@ const chai = require('chai');
 const assert = chai.assert;
 const config = require('../config.test.json');
 const db = require('../../src/db/db.js');
-const database = new db.DB(config);
+const logger = require('winston');
+
+// Configure logger settings
+logger.remove(logger.transports.Console);
+logger.add(logger.transports.Console, {
+    colorize: true,
+});
+logger.level = 'debug';
+
+const bot = {
+    logger,
+    config,
+};
+
+const database = new db.DB(bot);
 
 describe('Database connection', () => {
     it('should connect successfully', () => {
-        return database.connect().then((data) => {
+        database.init();
+        return database.start().then((data) => {
             assert.equal(data, 'Connected Successfully', 'Connection works successfully');
         })
     });
