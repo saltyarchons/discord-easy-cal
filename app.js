@@ -5,6 +5,7 @@ const auth = require('./auth.json'); // eslint-disable-line import/no-unresolved
 const config = require('./config.json');
 const db = require('./src/db/db');
 const httpServer = require('./src/http/server');
+const googleApi = require('./src/apis/google');
 const botClient = require('./src/botClient');
 
 const bot = {
@@ -23,6 +24,7 @@ logger.level = 'debug';
 
 bot.services.database = new db.DB(bot);
 bot.services.httpServer = new httpServer.HttpServer(bot);
+bot.services.googleApi = new googleApi.GoogleApi(bot);
 bot.services.discordClient = new botClient.BotClient(bot);
 
 Object.keys(bot.services).forEach((serviceKey) => {
