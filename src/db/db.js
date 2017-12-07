@@ -102,17 +102,21 @@ exports.DB = class extends ServiceBase {
      * @param {Object} calendar The calendar to store.
      */
     putCalendar(calendar) {
-        this.client.index({
-            index: CALENDAR_INDEX,
-            type: CALENDAR_TYPE,
-            id: calendar.id,
-            body: calendar,
-        }, (error) => {
-            if (error) {
-                this.logger.error(error);
-            } else {
-                this.logger.info(`Calendar with ${calendar.id} has successfully been inserted`);
-            }
+        return new Promise((resolve, reject) => {
+            this.client.index({
+                index: CALENDAR_INDEX,
+                type: CALENDAR_TYPE,
+                id: calendar.id,
+                body: calendar,
+            }, (error) => {
+                if (error) {
+                    this.logger.error(error);
+                    reject(error);
+                } else {
+                    this.logger.info(`Calendar with ${calendar.id} has successfully been inserted`);
+                    resolve('Calendar inserted');
+                }
+            });
         });
     }
 
