@@ -27,16 +27,23 @@ exports.GoogleApi = class extends ServiceBase {
     }
 
     getSessionToken(guildid) {
-        const authCode = this.app.services.database.getCalendarById(guildid);
-        let token = this.app.services.database.getToken(guildid);
-        if (!token) {
-            token = this.oauth2Client.getToken(authCode, function test(err, tokens) {
+        this.app.services.database.getCalendarById(guildid).then((result) => {
+            this.oauth2Client.getToken(result.token, function test(err, tokens) {
                 if (!err) {
-                    this.logger.info('token is $(token)');
+                    this.logger.info('token is $(tokens)');
                     this.oauth2Client.setCredentials(tokens);
                 }
             });
-        }
+        });
+    }
+
+    generateSessionToken(authCode) {
+        this.oauth2Client.getToken(authCode, function test(err, tokens) {
+            if (!err) {
+                this.logger.info('token is $(tokens)');
+                this.oauth2Client.setCredentials(tokens);
+            }
+        });
     }
 
     /* start() {
