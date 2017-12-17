@@ -4,7 +4,7 @@ const ServiceBase = require('./serviceBase');
 const Discord = require('discord.js');
 const fs = require('fs');
 
-exports.BotClient = class extends ServiceBase {
+exports.instanceClient = class extends ServiceBase {
     constructor(app) {
         super(app);
         this.client = new Discord.Client();
@@ -13,15 +13,15 @@ exports.BotClient = class extends ServiceBase {
 
     init() {
         super.init();
-        const bot = this;
+        const instance = this;
 
         // Load our events
         fs.readdir('./src/events/', (err, files) => {
-            if (err) return bot.logger.error(err);
+            if (err) return instance.bot.logger.error(err);
             files.forEach((file) => {
                 const eventFunction = require(`./events/${file}`);
                 const eventName = file.split('.')[0];
-                bot.events.push({
+                instance.events.push({
                     name: eventName,
                     aliases: eventFunction.aliases,
                 });
@@ -30,16 +30,16 @@ exports.BotClient = class extends ServiceBase {
         });
 
         this.client.on('ready', () => {
-            bot.logger.info('Connected');
-            bot.logger.info('Logged in as: ');
-            bot.logger.info(`${this.client.user.username} - (${bot.client.user.id})`);
+            instance.bot.logger.info('Connected');
+            instance.bot.logger.info('Logged in as: ');
+            instance.bot.logger.info(`${this.client.user.username} - (${instance.client.user.id})`);
         });
 
         this.client.on('message', (message) => {
-            // Ignore messages from bots
-            if (message.author.bot) return;
+            // Ignore messages from instances
+            if (message.author.instance) return;
             // Ignore messages which do not start in the prefix specified in the config
-            if (message.content.indexOf(bot.config.prefix) !== 0) return;
+            if (message.content.indexOf(instance.bot.config.prefix) !== 0) return;
 
             // Gather args from the input command
             const args = message.content.slice(this.config.prefix.length).trim().split(/ +/g);
@@ -48,7 +48,7 @@ exports.BotClient = class extends ServiceBase {
 
             // Try to find the file that contains the command specified
             // https://stackoverflow.com/questions/45856446/discord-js-reply-to-message-then-wait-for-reply
-            const event = bot.events.find((e) => {
+            const event = instance.events.find((e) => {
                 return e.name === command || (e.aliases && e.aliases.find((a) => {
                     return a === command;
                 }));
@@ -57,10 +57,10 @@ exports.BotClient = class extends ServiceBase {
                 try {
                     const commandFile = require(`./events/${event.name}.js`);
                     // Run the command
-                    commandFile.run(bot.client, bot.logger, message, args, this.app);
+                    commandFile.run(instance.client, instance.bot.logger, message, args, instance.bot);
                 } catch (err) {
                     message.reply('An error occured!');
-                    bot.logger.error(err);
+                    instance.logger.error(err);
                 }
             }
         });
@@ -68,7 +68,7 @@ exports.BotClient = class extends ServiceBase {
 
     start() {
         super.start();
-        // Log in the bot
-        this.client.login(this.auth.token);
+        // Log in the instance
+        this.client.login(this.bot.auth.token);
     }
 };

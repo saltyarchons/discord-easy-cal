@@ -24,24 +24,24 @@ exports.DB = class extends ServiceBase {
      */
     connect() {
         const operation = retry.operation({
-            retries: this.config.db.retry.times,
-            factor: this.config.db.retry.factor,
-            minTimeout: this.config.db.retry.minTimeoutInSeconds * 1000,
+            retries: this.bot.config.db.retry.times,
+            factor: this.bot.config.db.retry.factor,
+            minTimeout: this.bot.config.db.retry.minTimeoutInSeconds * 1000,
         });
 
         const result = new Promise((resolve, reject) => {
             operation.attempt((currentAttempt) => {
-                this.logger.info(`Attempting to connect to elasticsearch (attempt ${currentAttempt}).`);
+                this.bot.logger.info(`Attempting to connect to elasticsearch (attempt ${currentAttempt}).`);
                 this.client = new elasticsearch.Client({
-                    host: this.config.db.host,
-                    log: this.config.db.log,
+                    host: this.bot.config.db.host,
+                    log: this.bot.config.db.log,
                 });
                 this.client.ping({}, (error) => {
                     if (operation.retry(error)) {
-                        this.logger.warn(`Failed to connect to elasticsearch, retrying in ${this.config.db.retry.minTimeoutInSeconds} seconds.`);
+                        this.bot.logger.warn(`Failed to connect to elasticsearch, retrying in ${this.config.db.retry.minTimeoutInSeconds} seconds.`);
                         return;
                     }
-                    if (operation.attempts() > this.config.db.retry.times) {
+                    if (operation.attempts() > this.bot.config.db.retry.times) {
                         reject(error);
                     } else {
                         this.checkAndCreateMissingIndices();
@@ -59,7 +59,7 @@ exports.DB = class extends ServiceBase {
     checkAndCreateMissingIndices() {
         this.client.indices.exists({ index: CALENDAR_INDEX }, (error, exists) => {
             if (error) {
-                this.logger.error(error);
+                this.bot.logger.error(error);
                 return;
             }
             if (exists) {
@@ -74,10 +74,10 @@ exports.DB = class extends ServiceBase {
         this.client.indices.create({ index: name }, (err) => {
             // TODO(tree): add actual index mappings
             if (err) {
-                this.logger.error(err);
+                this.bot.logger.error(err);
                 return;
             }
-            this.logger.info(message);
+            this.bot.logger.info(message);
         });
     }
 
@@ -110,10 +110,10 @@ exports.DB = class extends ServiceBase {
                 body: calendar,
             }, (error) => {
                 if (error) {
-                    this.logger.error(error);
+                    this.bot.logger.error(error);
                     reject(error);
                 } else {
-                    this.logger.info(`Calendar with ${calendar.id} has successfully been inserted`);
+                    this.bot.logger.info(`Calendar with ${calendar.id} has successfully been inserted`);
                     resolve('Calendar inserted');
                 }
             });
@@ -147,9 +147,9 @@ exports.DB = class extends ServiceBase {
             body: token,
         }, (error) => {
             if (error) {
-                this.logger.error(error);
+                this.bot.logger.error(error);
             } else {
-                this.logger.info(`Token with id ${id} has successfully been inserted`);
+                this.bot.logger.info(`Token with id ${id} has successfully been inserted`);
             }
         });
     }
