@@ -4,7 +4,7 @@ const ServiceBase = require('./serviceBase');
 const Discord = require('discord.js');
 const fs = require('fs');
 
-exports.instanceClient = class extends ServiceBase {
+exports.BotClient = class extends ServiceBase {
     constructor(app) {
         super(app);
         this.client = new Discord.Client();
