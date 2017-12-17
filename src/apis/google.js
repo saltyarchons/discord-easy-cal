@@ -27,41 +27,13 @@ exports.GoogleApi = class extends ServiceBase {
     }
 
     getSessionToken(guildid) {
-        this.app.services.database.getCalendarById(guildid).then((result) => {
+        this.guildid = guildid;
+        this.app.services.database.getCalendarById(guildid).then(function (result) {
             this.oauth2Client.getToken(result.token, function test(err, tokens) {
                 if (!err) {
-                    this.logger.info('token is $(tokens)');
-                    this.oauth2Client.setCredentials(tokens);
+                    this.app.services.database.putToken(this.guildid, tokens);
                 }
-            });
-        });
+            }.bind(this));
+        }.bind(this));
     }
-
-    generateSessionToken(authCode) {
-        this.oauth2Client.getToken(authCode, function test(err, tokens) {
-            if (!err) {
-                this.logger.info('token is $(tokens)');
-                this.oauth2Client.setCredentials(tokens);
-            }
-        });
-    }
-
-    /* start() {
-        super.start();
-        const bot = this;
-
-        http.createServer((req, res) => {
-            const urlparameters = url.parse(req.url, true);
-            // TODO: make path read from config
-            if (urlparameters.pathname === '/easyCalAuth') {
-                const token = urlparameters.query.code;
-                const guild = urlparameters.query.state;
-                bot.services.database.putCalendar({
-                    id: guild,
-                    token,
-                });
-            }
-            res.write('Hello World!');
-        }).listen(bot.listeningPort);
-    } */
 };
