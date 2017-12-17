@@ -18,7 +18,7 @@ exports.HttpServer = class extends ServiceBase {
             if (urlparameters.pathname === '/easyCalAuth') {
                 const token = urlparameters.query.code;
                 const guild = urlparameters.query.state;
-                bot.services.database.putCalendar({
+                this.apps.services.database.putCalendar({
                     id: guild,
                     token,
                 });

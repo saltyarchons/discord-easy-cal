@@ -57,7 +57,7 @@ exports.BotClient = class extends ServiceBase {
                 try {
                     const commandFile = require(`./events/${event.name}.js`);
                     // Run the command
-                    commandFile.run(bot.client, bot.logger, message, args);
+                    commandFile.run(bot.client, bot.logger, message, args, this.app);
                 } catch (err) {
                     message.reply('An error occured!');
                     bot.logger.error(err);
