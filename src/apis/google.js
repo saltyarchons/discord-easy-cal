@@ -26,14 +26,17 @@ exports.GoogleApi = class extends ServiceBase {
         });
     }
 
+    // TODO: handle rejected promise
     getSessionToken(guildid) {
         this.guildid = guildid;
-        this.app.services.database.getCalendarById(guildid).then(function (result) {
-            this.oauth2Client.getToken(result.token, function test(err, tokens) {
+        this.app.services.database.getCalendarById(guildid).then((result) => {
+            this.oauth2Client.getToken(result.token, (err, tokens) => {
+                this.logger.info(tokens);
+                this.logger.info(err);
                 if (!err) {
                     this.app.services.database.putToken(this.guildid, tokens);
                 }
-            }.bind(this));
-        }.bind(this));
+            });
+        });
     }
 };
