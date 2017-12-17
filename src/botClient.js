@@ -1,5 +1,6 @@
 /* eslint import/no-dynamic-require: 0 */
 /* eslint global-require: 0 */
+/* eslint comma-dangle: 0 */
 const ServiceBase = require('./serviceBase');
 const Discord = require('discord.js');
 const fs = require('fs');
@@ -42,7 +43,7 @@ exports.BotClient = class extends ServiceBase {
             if (message.content.indexOf(instance.bot.config.prefix) !== 0) return;
 
             // Gather args from the input command
-            const args = message.content.slice(this.config.prefix.length).trim().split(/ +/g);
+            const args = message.content.slice(instance.bot.config.prefix.length).trim().split(/ +/g);
             // Split the command from the args and assign
             const command = args.shift().toLowerCase();
 
@@ -62,7 +63,7 @@ exports.BotClient = class extends ServiceBase {
                         instance.bot.logger,
                         message,
                         args,
-                        instance.bot,
+                        instance.bot
                     );
                 } catch (err) {
                     message.reply('An error occured!');

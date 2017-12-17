@@ -1,3 +1,4 @@
+/* eslint comma-dangle: 0 */
 const ServiceBase = require('../serviceBase');
 const google = require('googleapis');
 
@@ -8,7 +9,7 @@ exports.GoogleApi = class extends ServiceBase {
         this.oauth2Client = new google.auth.OAuth2(
             this.bot.auth.gcal.client_id,
             this.bot.auth.gcal.client_secret,
-            this.bot.auth.gcal.redirect_uris[0],
+            this.bot.auth.gcal.redirect_uris[0]
         );
     }
 
