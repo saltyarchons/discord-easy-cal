@@ -38,7 +38,7 @@ exports.DB = class extends ServiceBase {
                 });
                 this.client.ping({}, (error) => {
                     if (operation.retry(error)) {
-                        this.bot.logger.warn(`Failed to connect to elasticsearch, retrying in ${this.config.db.retry.minTimeoutInSeconds} seconds.`);
+                        this.bot.logger.warn(`Failed to connect to elasticsearch, retrying in ${this.bot.config.db.retry.minTimeoutInSeconds} seconds.`);
                         return;
                     }
                     if (operation.attempts() > this.bot.config.db.retry.times) {
