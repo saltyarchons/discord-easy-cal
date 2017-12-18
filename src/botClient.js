@@ -1,6 +1,5 @@
 /* eslint import/no-dynamic-require: 0 */
 /* eslint global-require: 0 */
-/* eslint comma-dangle: 0 */
 const ServiceBase = require('./serviceBase');
 const Discord = require('discord.js');
 const fs = require('fs');
@@ -63,7 +62,7 @@ exports.BotClient = class extends ServiceBase {
                         instance.bot.logger,
                         message,
                         args,
-                        instance.bot
+                        instance.bot,
                     );
                 } catch (err) {
                     message.reply('An error occured!');
